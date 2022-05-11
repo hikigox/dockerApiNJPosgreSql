@@ -1,0 +1,45 @@
+version: '3.9'
+
+
+services:
+  database:
+    image: 'postgres:latest'
+    ports:
+      - 15432:5432
+    env_file:
+      - .env
+    networks:
+      - network1
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  backend:
+    restart: always
+    build: ./api
+    volumes:
+      - ./api:/app/api
+    ports:
+      - 3985:3000
+    networks:
+      - network1
+      - network2
+  ngx:
+    image: nginx:latest
+    ports:
+      - 800:80
+    networks:
+      - network2
+ 
+    
+volumes:
+  database-data:
+ 
+networks:
+  network1:
+    driver: bridge
+    name: network1
+  network2:
+    driver: bridge
+    name: network2
+    
+
